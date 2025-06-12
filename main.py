@@ -1,48 +1,24 @@
+import kivy
+kivy.require('2.3.1')
 from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.properties import (
-    NumericProperty, ReferenceListProperty, ObjectProperty
-)
-from kivy.vector import Vector
-from kivy.clock import Clock
-from random import randint
+from kivy.uix.label import Label
+from kivy.uix.gridlayout import GridLayout
 
+from curency import get_exchange_rate
 
-class PongBall(Widget):
-    velocity_x = NumericProperty(0)
-    velocity_y = NumericProperty(0)
-    velocity = ReferenceListProperty(velocity_x, velocity_y)
+class ExchangeRates(GridLayout):
+    def __init__(self, curencies, **kwargs):
+        super().__init__(**kwargs)
+        self.cols = 2
+        for curency in curencies:
+            self.add_widget(Label(text=f'{curency.name}'))
+            self.add_widget(Label(text=f'{curency.vunit_rate}'))
 
-    def move(self):
-        self.pos = Vector(*self.velocity) + self.pos
-
-
-class PongGame(Widget):
-    ball = ObjectProperty(None)
-
-    def serve_ball(self):
-        self.ball.center = self.center
-        self.ball.velocity = Vector(4, 0).rotate(randint(0, 360))
-
-    def update(self, dt):
-        self.ball.move()
-
-        # bounce off top and bottom
-        if (self.ball.y < 0) or (self.ball.top > self.height):
-            self.ball.velocity_y *= -1
-
-        # bounce off left and right
-        if (self.ball.x < 0) or (self.ball.right > self.width):
-            self.ball.velocity_x *= -1
-
-
-class PongApp(App):
+class RateApp(App):
     def build(self):
-        game = PongGame()
-        game.serve_ball()
-        Clock.schedule_interval(game.update, 1.0 / 60.0)
-        return game
+        curency_names = ['USD', 'EUR', 'AED', 'CNY']
+        return ExchangeRates(get_exchange_rate(curency_names))
 
 
 if __name__ == '__main__':
-    PongApp().run()
+    RateApp().run()
