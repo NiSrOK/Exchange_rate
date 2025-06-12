@@ -1,5 +1,7 @@
-import requests
+import urllib.request
 import xml.etree.ElementTree as ET
+import ssl
+import certifi
 
 class Curency():
     def __init__(self, char_code, vunit_rate, name):
@@ -10,10 +12,10 @@ class Curency():
 
 def get_raw_exchange_rate():
     url = "https://www.cbr.ru/scripts/XML_daily.asp"
-    response = requests.get(url)
-    response.encoding = 'windows-1251'  # CBR возвращает XML в этой кодировке
-
-    root = ET.fromstring(response.text)
+    context = ssl.create_default_context(cafile=certifi.where())
+    with urllib.request.urlopen(url, context=context) as response:
+        xml_data = response.read().decode('windows-1251')
+    root = ET.fromstring(xml_data)
     return root
 
 def get_exchange_rate(char_codes):

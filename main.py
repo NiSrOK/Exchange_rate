@@ -1,5 +1,5 @@
 import kivy
-kivy.require('2.3.1')
+kivy.require('2.3.0')
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -16,8 +16,11 @@ class ExchangeRates(GridLayout):
 
 class RateApp(App):
     def build(self):
-        curency_names = ['USD', 'EUR', 'AED', 'CNY']
-        return ExchangeRates(get_exchange_rate(curency_names))
+        try:
+            curency_names = ['USD', 'EUR', 'AED', 'CNY']
+            return ExchangeRates(get_exchange_rate(curency_names))
+        except Exception as e:
+            return Label(text=f"Ошибка: {e}")
 
 
 if __name__ == '__main__':
